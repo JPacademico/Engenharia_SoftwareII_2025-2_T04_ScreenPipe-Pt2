@@ -51,21 +51,25 @@ O pipeline atende a três objetivos centrais:
 
 ## 3. Modelos Utilizados e Motivação
 
-BAAI/bge-base-en-v1.5 (BGE-Base):
+### BAAI/bge-base-en-v1.5 (BGE-Base)
 
-Motivação: Escolhido por ser um modelo de embedding de alta eficiência. Ele permitiu a criação de vetores de similaridade semântica para os logs de release de forma rápida, sendo fundamental para o funcionamento do pipeline de comparação de documentos sem sobrecarregar a memória RAM.
+**Motivação:**  
+Utilizado como modelo central de embeddings semânticos em todo o pipeline de comparação textual. O **bge-base-en-v1.5** foi escolhido por apresentar excelente equilíbrio entre qualidade semântica, velocidade de inferência e baixo consumo de memória. No sistema, ele é responsável pela vetorização de fragmentos textuais normalizados, permitindo o cálculo eficiente de similaridade via cosseno entre documentos técnicos. Sua adoção é fundamental para a identificação objetiva de convergências conceituais antes da etapa de inferência com LLMs, reduzindo ruído e delimitando com precisão os trechos mais relevantes para análise aprofundada.
 
-Qwen 2.5 (1.5B-Instruct):
+### Qwen 2.5 – 1.5B Instruct
 
-Motivação: Atuou como modelo de apoio inicial para contextualização. Devido à nossa infraestrutura inferior ao que seria necessário para modelos gigantes, o Qwen foi a escolha ideal por ser leve (1.5B), permitindo a triagem rápida dos dados do Screenpipe com baixo consumo de recursos.
+**Motivação:**  
+Empregado como modelo leve de apoio nas fases iniciais de triagem e contextualização. A escolha do Qwen 2.5 (1.5B parâmetros) decorre de sua capacidade de gerar interpretações coerentes com baixo custo computacional, sendo adequado para ambientes com restrição de recursos. No contexto do projeto, ele atua como mecanismo de análise preliminar e validação cruzada, possibilitando iterações rápidas sem sobrecarregar a GPU.
 
-Mistral-7B-Instruct-v0.3:
+### Mistral-7B-Instruct-v0.3
 
-Motivação: Responsável pela síntese e consolidação técnica. Para rodar em nossa GPU (RTX 4060) ou Colab T4, utilizamos quantização de 4 bits, o que permitiu extrair o conhecimento técnico do modelo sobre o fluxo de trabalho (Workflows) sem exceder a VRAM disponível.
+**Motivação:**  
+Responsável pela síntese técnica e geração das conclusões discursivas consolidadas. O Mistral-7B foi selecionado por seu forte desempenho em tarefas de raciocínio técnico e produção de texto estruturado. Para viabilizar sua execução em GPUs intermediárias (RTX 4060 ou Tesla T4), o modelo é utilizado com quantização em 4 bits, mantendo qualidade de inferência sem exceder os limites de VRAM. Ele opera exclusivamente sobre os trechos previamente selecionados pelo pipeline de similaridade, garantindo foco analítico e maior auditabilidade.
 
-Meta-LLaMA 3.1-8B-Instruct
+### Meta-LLaMA 3.1 – 8B Instruct
 
-Motivação: Utilizado para a avaliação crítica final e validação das estratégias de Engenharia de Software. Sua escolha justifica-se pelo alto grau de raciocínio lógico, sendo capaz de confirmar a aderência ao GitHub Flow e Rapid Releases, funcionando como o "validador" final de todo o processo.
+**Motivação:**  
+Utilizado na etapa final de avaliação crítica e validação conceitual das conclusões obtidas. O LLaMA 3.1–8B foi escolhido por seu elevado grau de capacidade lógica e consistência analítica, sendo empregado como um validador técnico das interpretações relacionadas a práticas de engenharia de software, workflows e estratégias de versionamento. Seu papel é confirmar aderência a modelos consolidados, como GitHub Flow e Rapid Releases, reforçando a robustez metodológica do pipeline.
 
 ------------------------------------------------------------------------
 
