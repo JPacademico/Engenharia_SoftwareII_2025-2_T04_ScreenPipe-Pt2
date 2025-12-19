@@ -1,10 +1,10 @@
-# 📘 Documentação Técnica Completa
+# Documentação Técnica Completa
 
 ## Pipeline de Análise Semântica, Releases e Comparação Textual com LLMs
 
 ------------------------------------------------------------------------
 
-## 🧭 Sumário
+## Sumário
 
 1.  Visão Geral\
 2.  Objetivos do Sistema\
