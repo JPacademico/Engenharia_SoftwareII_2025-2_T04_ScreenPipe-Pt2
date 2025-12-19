@@ -8,16 +8,17 @@
 
 1.  Visão Geral\
 2.  Objetivos do Sistema\
-3.  Arquitetura Geral\
-4.  Dependências e Requisitos\
-5.  Pipeline de Análise de Releases\
-6.  Pipeline Alternativo com Modelo Leve\
-7.  Pipeline de Comparação Semântica\
-8.  Geração de Conclusão Técnica\
-9.  Estrutura dos Resultados\
-10. Boas Práticas Adotadas\
-11. Possíveis Extensões\
-12. Conclusão Final
+3.  Modelos Utilizados e Motivação\
+4.  Arquitetura Geral\
+5.  Dependências e Requisitos\
+6.  Pipeline de Análise de Releases\
+7.  Pipeline Alternativo com Modelo Leve\
+8.  Pipeline de Comparação Semântica\
+9.  Geração de Conclusão Técnica\
+10.  Estrutura dos Resultados\
+11. Boas Práticas Adotadas\
+12. Possíveis Extensões\
+13. Conclusão Final
 
 ------------------------------------------------------------------------
 
@@ -44,15 +45,34 @@ O pipeline atende a três objetivos centrais:
     e possível derivação conceitual.
 -   Produzir conclusões técnicas discursivas, adequadas para
     documentação, auditoria ou análise arquitetural.
-
+    
 ------------------------------------------------------------------------
 
-## 3. Arquitetura Geral
+## 3. Modelos Utilizados e Motivação
+
+BAAI/bge-base-en-v1.5 (BGE-Base):
+
+Motivação: Escolhido por ser um modelo de embedding de alta eficiência. Ele permitiu a criação de vetores de similaridade semântica para os logs de release de forma rápida, sendo fundamental para o funcionamento do pipeline de comparação de documentos sem sobrecarregar a memória RAM.
+
+Qwen 2.5 (1.5B-Instruct):
+
+Motivação: Atuou como modelo de apoio inicial para contextualização. Devido à nossa infraestrutura inferior ao que seria necessário para modelos gigantes, o Qwen foi a escolha ideal por ser leve (1.5B), permitindo a triagem rápida dos dados do Screenpipe com baixo consumo de recursos.
+
+Mistral-7B-Instruct-v0.3:
+
+Motivação: Responsável pela síntese e consolidação técnica. Para rodar em nossa GPU (RTX 4060) ou Colab T4, utilizamos quantização de 4 bits, o que permitiu extrair o conhecimento técnico do modelo sobre o fluxo de trabalho (Workflows) sem exceder a VRAM disponível.
+
+Meta-LLaMA 3.1-8B-Instruct:
+
+Motivação: Utilizado para a avaliação crítica final e validação das estratégias de Engenharia de Software. Sua escolha justifica-se pelo alto grau de raciocínio lógico, sendo capaz de confirmar a aderência ao GitHub Flow e Rapid Releases, funcionando como o "validador" final de todo o processo.
+------------------------------------------------------------------------
+
+## 4. Arquitetura Geral
 
 A arquitetura é organizada em **três camadas lógicas**, com
 responsabilidades bem definidas.
 
-### 3.1 Camada de Inferência com LLMs
+### 4.1 Camada de Inferência com LLMs
 
 Responsável pela interpretação semântica profunda, geração de análises
 técnicas e síntese discursiva.
@@ -60,22 +80,22 @@ técnicas e síntese discursiva.
 Modelos utilizados: - **Mistral-7B-Instruct v0.3** - **Qwen 2.5 1.5B
 Instruct**
 
-### 3.2 Camada de Similaridade Semântica
+### 4.2 Camada de Similaridade Semântica
 
 Responsável pela vetorização e comparação matemática entre textos.
 
 Modelo utilizado: - **BAAI/bge-base-en-v1.5**
 
-### 3.3 Camada de Orquestração
+### 4.3 Camada de Orquestração
 
 Responsável por leitura de arquivos, fragmentação textual, controle de
 memória, construção de prompts e consolidação de resultados.
 
 ------------------------------------------------------------------------
 
-## 4. Dependências e Requisitos
+## 5. Dependências e Requisitos
 
-### 4.1 Bibliotecas
+### 5.1 Bibliotecas
 
 -   transformers\
 -   accelerate\
@@ -84,14 +104,14 @@ memória, construção de prompts e consolidação de resultados.
 -   sentence-transformers\
 -   numpy
 
-### 4.2 Requisitos de Hardware
+### 5.2 Requisitos de Hardware
 
 -   GPU NVIDIA com suporte CUDA\
 -   Recomendado **≥ 8 GB de VRAM** para execução do Mistral 7B em 4-bit
 
 ------------------------------------------------------------------------
 
-## 5. Pipeline de Análise de Releases
+## 6. Pipeline de Análise de Releases
 
 Este pipeline processa logs de releases para identificar:
 
@@ -104,7 +124,7 @@ determinística e controle rigoroso de contexto.
 
 ------------------------------------------------------------------------
 
-## 6. Pipeline Alternativo com Modelo Leve
+## 7. Pipeline Alternativo com Modelo Leve
 
 O modelo **Qwen 1.5B** é utilizado como alternativa ultraleve, indicado
 para:
@@ -117,25 +137,25 @@ Inclui limpeza explícita de memória e execução com `torch.no_grad()`.
 
 ------------------------------------------------------------------------
 
-## 7. Pipeline de Comparação Semântica
+## 8. Pipeline de Comparação Semântica
 
-### 7.1 Fragmentação
+### 8.1 Fragmentação
 
 Os documentos são divididos em blocos semanticamente coerentes, evitando
 truncamento excessivo.
 
-### 7.2 Vetorização
+### 8.2 Vetorização
 
 Cada fragmento é convertido em embedding vetorial normalizado.
 
-### 7.3 Similaridade
+### 8.3 Similaridade
 
 A similaridade é calculada via **cosseno**, selecionando os pares mais
 relevantes.
 
 ------------------------------------------------------------------------
 
-## 8. Geração de Conclusão Técnica
+## 9. Geração de Conclusão Técnica
 
 A conclusão final é gerada por um LLM de grande porte, utilizando
 exclusivamente os trechos mais similares.
@@ -150,7 +170,7 @@ Características da conclusão:
 
 ------------------------------------------------------------------------
 
-## 9. Estrutura dos Resultados
+## 10. Estrutura dos Resultados
 
 O resultado final contém:
 
@@ -160,7 +180,7 @@ O resultado final contém:
 
 ------------------------------------------------------------------------
 
-## 10. Boas Práticas Adotadas
+## 11. Boas Práticas Adotadas
 
 -   Quantização em 4 bits\
 -   Separação clara de responsabilidades\
@@ -170,7 +190,7 @@ O resultado final contém:
 
 ------------------------------------------------------------------------
 
-## 11. Possíveis Extensões
+## 12. Possíveis Extensões
 
 -   Persistência em banco vetorial\
 -   Integração com pipelines CI/CD\
@@ -180,7 +200,7 @@ O resultado final contém:
 
 ------------------------------------------------------------------------
 
-## 12. Conclusão Final
+## 13. Conclusão Final
 
 Este pipeline representa uma **arquitetura madura e extensível de
 análise semântica**, adequada para **documentação estratégica**,
